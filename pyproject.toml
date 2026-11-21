@@ -47,4 +47,5 @@ explicit_package_bases = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "--cov=camara_tracker --cov-report=term-missing"
+addopts = "-m 'not live' --cov=camara_tracker --cov-report=term-missing"
+markers = ["live: makes a real request to the public Câmara API"]

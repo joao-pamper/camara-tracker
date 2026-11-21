@@ -1,7 +1,7 @@
 PYTHON ?= python3
 VENV ?= .venv
 
-.PHONY: install test lint format
+.PHONY: install test lint format smoke
 
 install:
 	$(PYTHON) -m venv $(VENV)
@@ -18,3 +18,6 @@ lint:
 format:
 	$(VENV)/bin/python -m ruff format .
 	$(VENV)/bin/python -m ruff check --fix .
+
+smoke:
+	$(VENV)/bin/python -m pytest -m live
