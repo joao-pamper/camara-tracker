@@ -10,9 +10,11 @@ from camara_tracker.api import CamaraClient
 from camara_tracker.config import Settings
 from camara_tracker.ingest import (
     compact_despesas,
+    compact_votacoes,
     ingest_deputados,
     ingest_despesas,
     ingest_partidos,
+    ingest_votacoes,
 )
 from camara_tracker.storage import read_parquet
 
@@ -129,6 +131,66 @@ def despesas_compact(
         total = sum(float(value) if value is not None else 0.0 for value in values)
         ano = result.path.stem.rsplit("_", 1)[-1]
         typer.echo(f"{ano}: {result.rows} rows, valorLiquido {total:.2f}")
+
+
+def _report_votacoes_progress(done: int, total: int) -> None:
+    """Print one progress line per month."""
+    typer.echo(f"votacoes: {done}/{total} months")
+
+
+@ingest_app.command(name="votacoes")
+def votacoes(
+    year: Annotated[list[int] | None, typer.Option("--year")] = None,
+    month: Annotated[list[int] | None, typer.Option("--month")] = None,
+    orgao: Annotated[str | None, typer.Option("--orgao")] = None,
+    limit_votacoes: Annotated[int | None, typer.Option("--limit-votacoes")] = None,
+    force: Annotated[bool, typer.Option("--force")] = False,
+    data_dir: Annotated[Path, typer.Option("--data-dir")] = DEFAULT_DATA_DIR,
+) -> None:
+    """Ingest monthly plenary votações and votes into bronze shards."""
+    settings = Settings(data_dir=data_dir)
+    with CamaraClient() as client:
+        result = ingest_votacoes(
+            client,
+            settings,
+            years=year,
+            months=month,
+            orgao=orgao,
+            limit_votacoes=limit_votacoes,
+            force=force,
+            progress=_report_votacoes_progress,
+        )
+
+    for ano, mes, votacao_id, message in result.failed:
+        typer.echo(
+            f"votacoes failed: {ano}-{mes:02d} votação {votacao_id}: {message}",
+            err=True,
+        )
+    typer.echo(
+        f"votacoes: fetched {result.months_fetched}, skipped {result.months_skipped}, "
+        f"failed {len(result.failed)}, "
+        f"votacoes rows {result.votacoes_rows}, votos rows {result.votos_rows}"
+    )
+    if result.failed:
+        raise typer.Exit(code=1)
+
+
+@ingest_app.command(name="votacoes-compact")
+def votacoes_compact(
+    year: Annotated[list[int] | None, typer.Option("--year")] = None,
+    data_dir: Annotated[Path, typer.Option("--data-dir")] = DEFAULT_DATA_DIR,
+) -> None:
+    """Merge monthly votações and votos shards into yearly bronze files."""
+    settings = Settings(data_dir=data_dir)
+    try:
+        results = compact_votacoes(settings, years=year)
+    except FileNotFoundError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+
+    for result in results:
+        ano = result.path.stem.rsplit("_", 1)[-1]
+        typer.echo(f"{ano}: {result.dataset} {result.rows} rows -> {result.path}")
 
 
 if __name__ == "__main__":

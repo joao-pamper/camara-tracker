@@ -7,7 +7,13 @@ import pytest
 
 from camara_tracker.api import CamaraClient
 from camara_tracker.config import Settings
-from camara_tracker.ingest import ingest_despesas, ingest_partidos, shard_path
+from camara_tracker.ingest import (
+    ingest_despesas,
+    ingest_partidos,
+    ingest_votacoes,
+    shard_path,
+    shard_paths,
+)
 
 
 @pytest.mark.live
@@ -55,3 +61,25 @@ def test_live_ingest_despesas(tmp_path: Path) -> None:
     path = shard_path(settings, 2024, 62881)
     assert result.rows > 0
     assert path.exists()
+
+
+@pytest.mark.live
+def test_live_ingest_votacoes(tmp_path: Path) -> None:
+    """Ingest a small live month of votações and verify both shards are written."""
+    settings = Settings(data_dir=tmp_path, min_interval_s=0.0)
+
+    with CamaraClient(settings) as client:
+        result = ingest_votacoes(
+            client,
+            settings,
+            years=[2024],
+            months=[3],
+            limit_votacoes=2,
+            now=datetime.now(tz=UTC),
+        )
+
+    assert result.months_fetched == 1
+    assert result.votacoes_rows == 2
+    assert result.failed == []
+    for path in shard_paths(settings, 2024, 3):
+        assert path.exists()

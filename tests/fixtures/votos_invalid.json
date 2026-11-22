@@ -1,0 +1,19 @@
+{
+  "dados": [
+    {
+      "tipoVoto": "Sim",
+      "dataRegistroVoto": "2024-03-12T17:56:06",
+      "deputado_": {
+        "nome": "Sem id",
+        "siglaPartido": "PRD",
+        "siglaUf": "GO"
+      }
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2400001-1/votos"
+    }
+  ]
+}

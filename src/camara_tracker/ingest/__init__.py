@@ -10,14 +10,30 @@ from camara_tracker.ingest.despesas import (
     shard_path,
 )
 from camara_tracker.ingest.partidos import ingest_partidos
+from camara_tracker.ingest.votacoes import (
+    VotacoesResult,
+    compact_votacoes,
+    ingest_votacoes,
+    shard_paths,
+    votacoes_shard_path,
+    votos_shard_path,
+)
+from camara_tracker.ingest.votacoes import is_fresh as is_votacoes_fresh
 
 __all__ = [
     "DespesasResult",
     "IngestResult",
+    "VotacoesResult",
     "compact_despesas",
+    "compact_votacoes",
     "ingest_deputados",
     "ingest_despesas",
     "ingest_partidos",
+    "ingest_votacoes",
     "is_fresh",
+    "is_votacoes_fresh",
     "shard_path",
+    "shard_paths",
+    "votacoes_shard_path",
+    "votos_shard_path",
 ]

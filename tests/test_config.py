@@ -24,6 +24,8 @@ def test_settings_defaults() -> None:
     assert settings.legislatura == 57
     assert settings.first_year == 2023
     assert settings.shard_max_age_hours == 24.0
+    assert settings.votes_orgao == "PLEN"
+    assert settings.open_month_max_age_hours == 24.0
 
 
 def test_settings_are_frozen() -> None:

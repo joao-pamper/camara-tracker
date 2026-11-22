@@ -1,0 +1,23 @@
+{
+  "dados": [
+    {
+      "id": "2400003-1",
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2400003-1",
+      "data": "2024-03-12",
+      "dataHoraRegistro": "2024-03-12T17:45:37",
+      "siglaOrgao": "PLEN",
+      "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/180",
+      "uriEvento": null,
+      "proposicaoObjeto": null,
+      "uriProposicaoObjeto": null,
+      "descricao": "Aprovado, por unanimidade, o Requerimento de Urgência.",
+      "aprovacao": 1
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/votacoes?dataInicio=2024-03-01&dataFim=2024-03-31&itens=2&pagina=2"
+    }
+  ]
+}

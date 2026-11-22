@@ -9,11 +9,13 @@ import pyarrow.parquet as pq
 import pytest
 
 from camara_tracker import storage
-from camara_tracker.models import Deputado, Despesa
+from camara_tracker.models import Deputado, Despesa, Votacao, Voto
 from camara_tracker.storage import (
     DEPUTADOS_SCHEMA,
     DESPESAS_SCHEMA,
     PARTIDOS_SCHEMA,
+    VOTACOES_SCHEMA,
+    VOTOS_SCHEMA,
     read_parquet,
     records_to_table,
     write_parquet,
@@ -102,3 +104,29 @@ def test_records_to_table_adds_constant_columns() -> None:
     assert table.column("_deputado_id").to_pylist() == [62881]
     assert table.column("_ano").to_pylist() == [2024]
     assert table.column("valorLiquido").to_pylist() == [-103.8]
+
+
+def test_records_to_table_votacoes_and_votos() -> None:
+    """Vote tables carry explicit schemas and the per-row votação id."""
+    votacao = Votacao(id="2400001-1", siglaOrgao="PLEN", aprovacao=1)
+    voto = Voto(
+        deputado_id=166402,
+        deputado_siglaPartido="PRD",
+        deputado_siglaUf="GO",
+        tipoVoto="Sim",
+        dataRegistroVoto="2024-03-12T17:56:06",
+    )
+    votacoes_table = records_to_table([votacao], VOTACOES_SCHEMA, NOW, 57)
+    votos_table = records_to_table(
+        [voto],
+        VOTOS_SCHEMA,
+        NOW,
+        57,
+        constants={"_votacao_id": "2400001-1"},
+    )
+
+    assert votacoes_table.schema == VOTACOES_SCHEMA
+    assert votacoes_table.column("id").to_pylist() == ["2400001-1"]
+    assert votos_table.schema == VOTOS_SCHEMA
+    assert votos_table.column("_votacao_id").to_pylist() == ["2400001-1"]
+    assert votos_table.column("deputado_id").to_pylist() == [166402]

@@ -170,6 +170,26 @@ def test_empty_dados_stops_iteration() -> None:
     assert len(route.calls) == 1
 
 
+def test_iter_items_unpaged_sends_no_itens_or_pagina() -> None:
+    """Endpoints that reject pagination params can be read with one plain request."""
+    with respx.mock(assert_all_called=False) as router:
+        route = router.get(f"{BASE_URL}/votacoes/v1/votos").mock(
+            return_value=httpx.Response(200, json={"dados": [{"id": 1}], "links": []})
+        )
+        client, _, _ = make_client()
+        with client:
+            items = list(
+                client.iter_items("/votacoes/v1/votos", {"uf": "SP"}, paginate=False)
+            )
+
+    assert items == [{"id": 1}]
+    assert len(route.calls) == 1
+    params = route.calls[0].request.url.params
+    assert params["uf"] == "SP"
+    assert "itens" not in params
+    assert "pagina" not in params
+
+
 def test_503_then_200_succeeds() -> None:
     """A server error is retried with exponential backoff and jitter."""
     settings = Settings(

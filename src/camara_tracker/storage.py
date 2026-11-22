@@ -64,6 +64,37 @@ DESPESAS_SCHEMA: pa.Schema = pa.schema(
     ]
 )
 
+VOTACOES_SCHEMA: pa.Schema = pa.schema(
+    [
+        pa.field("id", pa.string()),
+        pa.field("uri", pa.string()),
+        pa.field("data", pa.string()),
+        pa.field("dataHoraRegistro", pa.string()),
+        pa.field("siglaOrgao", pa.string()),
+        pa.field("uriOrgao", pa.string()),
+        pa.field("uriEvento", pa.string()),
+        pa.field("proposicaoObjeto", pa.string()),
+        pa.field("uriProposicaoObjeto", pa.string()),
+        pa.field("descricao", pa.string()),
+        pa.field("aprovacao", pa.int32()),
+        pa.field("_ingested_at", pa.timestamp("us", tz="UTC")),
+        pa.field("_legislatura", pa.int32()),
+    ]
+)
+
+VOTOS_SCHEMA: pa.Schema = pa.schema(
+    [
+        pa.field("tipoVoto", pa.string()),
+        pa.field("dataRegistroVoto", pa.string()),
+        pa.field("deputado_id", pa.int64()),
+        pa.field("deputado_siglaPartido", pa.string()),
+        pa.field("deputado_siglaUf", pa.string()),
+        pa.field("_ingested_at", pa.timestamp("us", tz="UTC")),
+        pa.field("_legislatura", pa.int32()),
+        pa.field("_votacao_id", pa.string()),
+    ]
+)
+
 
 def write_parquet(table: pa.Table, path: Path) -> None:
     """Atomically write a table with zstd compression."""

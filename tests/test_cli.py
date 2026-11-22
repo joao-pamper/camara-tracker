@@ -174,3 +174,81 @@ def test_despesas_compact_command_without_shards_exits_nonzero(tmp_path: Path) -
     output = result.stdout + result.stderr
     assert result.exit_code == 1
     assert "No despesas shards for ano 2024" in output
+
+
+def mock_votacoes_routes(router: respx.Router) -> None:
+    """Mock one month of votações with a nominal and a symbolic PLEN vote."""
+    router.get(f"{BASE_URL}/votacoes").mock(
+        side_effect=[
+            httpx.Response(200, json=load_fixture("votacoes_page_1.json")),
+            httpx.Response(200, json=load_fixture("votacoes_page_2.json")),
+        ]
+    )
+    router.get(f"{BASE_URL}/votacoes/2400001-1/votos").mock(
+        return_value=httpx.Response(200, json=load_fixture("votos_nominal.json"))
+    )
+    router.get(f"{BASE_URL}/votacoes/2400003-1/votos").mock(
+        return_value=httpx.Response(200, json=load_fixture("votos_empty.json"))
+    )
+
+
+def test_ingest_votacoes_command_writes_shards(tmp_path: Path) -> None:
+    """The votacoes command reports progress and writes both monthly shards."""
+    with respx.mock(assert_all_called=False) as router:
+        mock_votacoes_routes(router)
+        result = CliRunner().invoke(
+            app,
+            ["ingest", "votacoes", "--year", "2024", "--month", "3", "--data-dir", str(tmp_path)],
+        )
+
+    assert result.exit_code == 0, result.stdout
+    assert "votacoes: 1/1 months" in result.stdout
+    assert "votacoes rows 3" in result.stdout
+    assert "votos rows 2" in result.stdout
+    assert (
+        tmp_path / "bronze" / "votacoes" / "_shards" / "ano=2024" / "mes=03.parquet"
+    ).exists()
+    assert (
+        tmp_path / "bronze" / "votos" / "_shards" / "ano=2024" / "mes=03.parquet"
+    ).exists()
+
+
+def test_ingest_votacoes_command_exits_nonzero_on_failure(tmp_path: Path) -> None:
+    """A failed votos request makes the votacoes command exit non-zero."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/votacoes").mock(
+            return_value=httpx.Response(
+                200,
+                json={"dados": [{"id": "2400001-1", "siglaOrgao": "PLEN"}], "links": []},
+            )
+        )
+        router.get(f"{BASE_URL}/votacoes/2400001-1/votos").mock(
+            return_value=httpx.Response(500)
+        )
+        result = CliRunner().invoke(
+            app,
+            ["ingest", "votacoes", "--year", "2024", "--month", "3", "--data-dir", str(tmp_path)],
+        )
+
+    assert result.exit_code == 1
+    assert "failed 1" in result.stdout
+
+
+def test_votacoes_compact_command_reports_rows(tmp_path: Path) -> None:
+    """The compact command reports rows for both yearly datasets."""
+    with respx.mock(assert_all_called=False) as router:
+        mock_votacoes_routes(router)
+        runner = CliRunner()
+        ingest_result = runner.invoke(
+            app,
+            ["ingest", "votacoes", "--year", "2024", "--month", "3", "--data-dir", str(tmp_path)],
+        )
+        compact_result = runner.invoke(
+            app,
+            ["ingest", "votacoes-compact", "--year", "2024", "--data-dir", str(tmp_path)],
+        )
+
+    assert ingest_result.exit_code == 0, ingest_result.stdout
+    assert compact_result.exit_code == 0, compact_result.stdout
+    assert "2024: votacoes 3 rows" in compact_result.stdout
+    assert "2024: votos 2 rows" in compact_result.stdout

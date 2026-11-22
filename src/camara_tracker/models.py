@@ -1,6 +1,8 @@
 """Pydantic models for validated API data."""
 
-from pydantic import BaseModel, ConfigDict
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class Deputado(BaseModel):
@@ -52,3 +54,55 @@ class Despesa(BaseModel):
     codLote: int | None = None
     urlDocumento: str | None = None
     numRessarcimento: str | None = None
+
+
+class Votacao(BaseModel):
+    """Raw votação fields as returned by the API; ``id`` keeps its API type."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    id: str | int
+    uri: str | None = None
+    data: str | None = None
+    dataHoraRegistro: str | None = None
+    siglaOrgao: str | None = None
+    uriOrgao: str | None = None
+    uriEvento: str | None = None
+    proposicaoObjeto: str | None = None
+    uriProposicaoObjeto: str | None = None
+    descricao: str | None = None
+    aprovacao: int | None = None
+
+
+class Voto(BaseModel):
+    """Voto row with the nested ``deputado_`` object flattened for bronze.
+
+    The API returns ``{"tipoVoto": ..., "dataRegistroVoto": ..., "deputado_": {...}}``.
+    Validation promotes ``deputado_.id`` to the required ``deputado_id`` and
+    ``deputado_.siglaPartido`` / ``deputado_.siglaUf`` to ``deputado_siglaPartido`` /
+    ``deputado_siglaUf``. The nested object and all other fields are ignored, while
+    ``tipoVoto`` and ``dataRegistroVoto`` are kept exactly as returned.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    deputado_id: int
+    deputado_siglaPartido: str | None = None
+    deputado_siglaUf: str | None = None
+    tipoVoto: str | None = None
+    dataRegistroVoto: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _flatten_deputado(cls, value: Any) -> Any:
+        """Copy nested deputy fields into flat names before field validation."""
+        if not isinstance(value, dict):
+            return value
+        deputado = value.get("deputado_")
+        if not isinstance(deputado, dict):
+            return value
+        flattened = dict(value)
+        flattened["deputado_id"] = deputado.get("id")
+        flattened["deputado_siglaPartido"] = deputado.get("siglaPartido")
+        flattened["deputado_siglaUf"] = deputado.get("siglaUf")
+        return flattened

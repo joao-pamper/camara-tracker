@@ -1,0 +1,40 @@
+{
+  "dados": [
+    {
+      "id": "2400001-1",
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2400001-1",
+      "data": "2024-03-05",
+      "dataHoraRegistro": "2024-03-05T19:07:46",
+      "siglaOrgao": "PLEN",
+      "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/180",
+      "uriEvento": "https://dadosabertos.camara.leg.br/api/v2/eventos/71957",
+      "proposicaoObjeto": "REQ 3280/2023",
+      "uriProposicaoObjeto": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2390234",
+      "descricao": "Aprovado, por unanimidade, o Requerimento de Urgência.",
+      "aprovacao": 1
+    },
+    {
+      "id": "2400002-1",
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2400002-1",
+      "data": "2024-03-05",
+      "dataHoraRegistro": "2024-03-05T17:45:37",
+      "siglaOrgao": "CEDESNAT",
+      "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/539635",
+      "uriEvento": null,
+      "proposicaoObjeto": null,
+      "uriProposicaoObjeto": null,
+      "descricao": "Aprovado.",
+      "aprovacao": 1
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/votacoes?dataInicio=2024-03-01&dataFim=2024-03-31&itens=2&pagina=1"
+    },
+    {
+      "rel": "next",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/votacoes?dataInicio=2024-03-01&dataFim=2024-03-31&itens=2&pagina=2"
+    }
+  ]
+}

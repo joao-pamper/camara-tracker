@@ -1,0 +1,40 @@
+{
+  "dados": [
+    {
+      "tipoVoto": "Sim",
+      "dataRegistroVoto": "2024-03-12T17:56:06",
+      "deputado_": {
+        "id": 166402,
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/166402",
+        "nome": "Magda Mofatto",
+        "siglaPartido": "PRD",
+        "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/38010",
+        "siglaUf": "GO",
+        "idLegislatura": 57,
+        "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/166402.jpg",
+        "email": "dep.magdamofatto@camara.leg.br"
+      }
+    },
+    {
+      "tipoVoto": "Não",
+      "dataRegistroVoto": "2024-03-12T17:56:10",
+      "deputado_": {
+        "id": 178957,
+        "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/178957",
+        "nome": "Deputado Teste",
+        "siglaPartido": "PT",
+        "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/38913",
+        "siglaUf": "SP",
+        "idLegislatura": 57,
+        "urlFoto": null,
+        "email": null
+      }
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2400001-1/votos"
+    }
+  ]
+}

@@ -20,3 +20,5 @@ class Settings:
     legislatura: int = 57
     first_year: int = 2023
     shard_max_age_hours: float = 24.0
+    votes_orgao: str = "PLEN"
+    open_month_max_age_hours: float = 24.0

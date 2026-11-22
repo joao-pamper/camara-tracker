@@ -1,0 +1,23 @@
+{
+  "dados": [
+    {
+      "id": "2400011-1",
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2400011-1",
+      "data": "2024-04-02",
+      "dataHoraRegistro": "2024-04-02T14:00:00",
+      "siglaOrgao": "PLEN",
+      "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/180",
+      "uriEvento": null,
+      "proposicaoObjeto": null,
+      "uriProposicaoObjeto": null,
+      "descricao": "Votação nominal.",
+      "aprovacao": 1
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/votacoes?dataInicio=2024-04-01&dataFim=2024-04-30&itens=2&pagina=1"
+    }
+  ]
+}

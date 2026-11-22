@@ -111,8 +111,20 @@ class CamaraClient:
         params: Mapping[str, Any] | None = None,
         *,
         max_pages: int | None = None,
+        paginate: bool = True,
     ) -> Iterator[list[dict[str, Any]]]:
-        """Yield each page's ``dados`` list, following ``next`` links."""
+        """Yield each page's ``dados`` list, following ``next`` links.
+
+        Endpoints that reject ``itens``/``pagina`` (such as votos) can set
+        ``paginate=False`` to make one plain request with the given params.
+        """
+        if not paginate:
+            payload = self.get(path, params)
+            items = self._dados(payload, path)
+            if items:
+                yield items
+            return
+
         next_url: str | None = None
         pages_seen = 0
 
@@ -141,9 +153,10 @@ class CamaraClient:
         params: Mapping[str, Any] | None = None,
         *,
         max_pages: int | None = None,
+        paginate: bool = True,
     ) -> Iterator[dict[str, Any]]:
         """Yield individual items across pages."""
-        for page in self.iter_pages(path, params, max_pages=max_pages):
+        for page in self.iter_pages(path, params, max_pages=max_pages, paginate=paginate):
             yield from page
 
     def _absolute_url(self, path: str) -> str:

@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from camara_tracker.models import Deputado, Despesa, Partido
+from camara_tracker.models import Deputado, Despesa, Partido, Votacao, Voto
 
 
 def test_deputado_parses_valid_row() -> None:
@@ -98,3 +98,69 @@ def test_missing_id_fails(model: type[Deputado] | type[Partido]) -> None:
     """Both models require the raw id field."""
     with pytest.raises(ValidationError):
         model.model_validate({"nome": "sem id"})
+
+
+def test_votacao_parses_verified_row() -> None:
+    """A verified votação row parses with its raw string id and raw field names."""
+    row = Votacao.model_validate(
+        {
+            "id": "2390234-8",
+            "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/2390234-8",
+            "data": "2024-03-05",
+            "dataHoraRegistro": "2024-03-05T19:07:46",
+            "siglaOrgao": "PLEN",
+            "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/180",
+            "uriEvento": "https://dadosabertos.camara.leg.br/api/v2/eventos/71957",
+            "proposicaoObjeto": "REQ 3280/2023",
+            "uriProposicaoObjeto": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2390234",
+            "descricao": "Aprovado, por unanimidade.",
+            "aprovacao": 1,
+            "futureField": "ignored",
+        }
+    )
+
+    assert row.id == "2390234-8"
+    assert isinstance(row.id, str)
+    assert row.siglaOrgao == "PLEN"
+    assert row.aprovacao == 1
+    assert not hasattr(row, "futureField")
+
+
+def test_votacao_accepts_all_optional_fields_missing() -> None:
+    """Only the votação id is required."""
+    row = Votacao.model_validate({"id": 42})
+
+    assert row.id == 42
+    assert row.data is None
+    assert row.siglaOrgao is None
+
+
+def test_voto_flattens_nested_deputado() -> None:
+    """The nested deputado_ object is promoted to flat bronze columns."""
+    row = Voto.model_validate(
+        {
+            "tipoVoto": "Sim",
+            "dataRegistroVoto": "2024-03-12T17:56:06",
+            "deputado_": {
+                "id": 166402,
+                "nome": "Magda Mofatto",
+                "siglaPartido": "PRD",
+                "siglaUf": "GO",
+                "idLegislatura": 57,
+                "email": "dep@example.test",
+            },
+        }
+    )
+
+    assert row.deputado_id == 166402
+    assert row.deputado_siglaPartido == "PRD"
+    assert row.deputado_siglaUf == "GO"
+    assert row.tipoVoto == "Sim"
+    assert row.dataRegistroVoto == "2024-03-12T17:56:06"
+    assert not hasattr(row, "deputado_")
+
+
+def test_voto_requires_deputado_id() -> None:
+    """A nested deputado_ object without id fails validation."""
+    with pytest.raises(ValidationError):
+        Voto.model_validate({"tipoVoto": "Sim", "deputado_": {"nome": "Sem id"}})
