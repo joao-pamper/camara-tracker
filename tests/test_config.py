@@ -1,6 +1,7 @@
 """Tests for configuration defaults."""
 
 from dataclasses import FrozenInstanceError
+from pathlib import Path
 
 import pytest
 
@@ -19,6 +20,8 @@ def test_settings_defaults() -> None:
     assert settings.backoff_max_s == 30.0
     assert settings.min_interval_s == 0.2
     assert settings.user_agent == "camara-tracker/0.1"
+    assert settings.data_dir == Path("data")
+    assert settings.legislatura == 57
 
 
 def test_settings_are_frozen() -> None:

@@ -86,9 +86,7 @@ class CamaraClient:
 
             if self._is_retryable_status(response.status_code):
                 retry_after = (
-                    self._retry_after_seconds(response)
-                    if response.status_code == 429
-                    else None
+                    self._retry_after_seconds(response) if response.status_code == 429 else None
                 )
                 self._retry_or_raise(
                     attempt=attempt,

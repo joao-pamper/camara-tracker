@@ -1,0 +1,16 @@
+{
+  "dados": [
+    {
+      "id": 999999,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/999999",
+      "nome": "Invalid Deputado",
+      "siglaPartido": "XX",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/1",
+      "siglaUf": "SP",
+      "idLegislatura": "not-an-int",
+      "urlFoto": null,
+      "email": null
+    }
+  ],
+  "links": []
+}

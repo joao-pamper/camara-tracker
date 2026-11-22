@@ -1,0 +1,22 @@
+{
+  "dados": [
+    {
+      "id": 37906,
+      "sigla": "PL",
+      "nome": "Partido Liberal",
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906"
+    },
+    {
+      "id": 37915,
+      "sigla": "REPUBLICANOS",
+      "nome": "Republicanos",
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/37915"
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/partidos?idLegislatura=57&itens=2&pagina=2"
+    }
+  ]
+}

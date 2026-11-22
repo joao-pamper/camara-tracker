@@ -1,0 +1,38 @@
+{
+  "dados": [
+    {
+      "id": 220593,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220593",
+      "nome": "Abilio Brunini",
+      "siglaPartido": "PL",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
+      "siglaUf": "MT",
+      "idLegislatura": 57,
+      "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220593.jpg",
+      "email": null
+    },
+    {
+      "id": 220593,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220593",
+      "nome": "Updated Deputado",
+      "siglaPartido": "PL",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
+      "siglaUf": "MT",
+      "idLegislatura": 57,
+      "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220593.jpg",
+      "email": null
+    },
+    {
+      "id": 999001,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/999001",
+      "nome": "Outro Deputado",
+      "siglaPartido": "XX",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/1",
+      "siglaUf": "SP",
+      "idLegislatura": 57,
+      "urlFoto": null,
+      "email": null
+    }
+  ],
+  "links": []
+}

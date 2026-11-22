@@ -1,8 +1,12 @@
-"""Opt-in live smoke test against the public Câmara API."""
+"""Opt-in live smoke tests against the public Câmara API."""
+
+from pathlib import Path
 
 import pytest
 
 from camara_tracker.api import CamaraClient
+from camara_tracker.config import Settings
+from camara_tracker.ingest import ingest_partidos
 
 
 @pytest.mark.live
@@ -17,3 +21,15 @@ def test_live_deputados() -> None:
         items = [item for page in pages for item in page]
 
     assert any("id" in item for item in items)
+
+
+@pytest.mark.live
+def test_live_ingest_partidos(tmp_path: Path) -> None:
+    """Ingest one live page of parties and verify a Parquet file is written."""
+    settings = Settings(data_dir=tmp_path)
+
+    with CamaraClient() as client:
+        result = ingest_partidos(client, settings, max_pages=1)
+
+    assert result.rows > 0
+    assert result.path.exists()

@@ -1,6 +1,7 @@
 """Configuration defaults for camara-tracker."""
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -15,3 +16,5 @@ class Settings:
     backoff_max_s: float = 30.0
     min_interval_s: float = 0.2
     user_agent: str = "camara-tracker/0.1"
+    data_dir: Path = Path("data")
+    legislatura: int = 57
