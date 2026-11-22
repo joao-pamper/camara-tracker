@@ -1,7 +1,8 @@
 """Ingest plenary votações and their votes into the bronze layer."""
 
+import logging
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -10,7 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from pydantic import ValidationError
 
-from camara_tracker.api import CamaraClient
+from camara_tracker.api import ApiError, CamaraClient
 from camara_tracker.config import Settings
 from camara_tracker.ingest.common import IngestResult, utc_now
 from camara_tracker.models import Votacao, Voto
@@ -20,6 +21,8 @@ from camara_tracker.storage import (
     records_to_table,
     write_parquet,
 )
+
+logger = logging.getLogger(__name__)
 
 INGESTED_AT_KEY = b"_ingested_at"
 
@@ -33,6 +36,7 @@ class VotacoesResult:
     failed: list[tuple[int, int, str, str]]
     votacoes_rows: int
     votos_rows: int
+    votos_not_found: list[tuple[int, int, str]] = field(default_factory=list)
 
 
 def votacoes_shard_path(settings: Settings, ano: int, mes: int) -> Path:
@@ -174,6 +178,7 @@ def ingest_votacoes(
     votacoes_rows = 0
     votos_rows = 0
     failed: list[tuple[int, int, str, str]] = []
+    votos_not_found: list[tuple[int, int, str]] = []
 
     for done, (ano, mes) in enumerate(month_values, start=1):
         votacoes_path, votos_path = shard_paths(settings, ano, mes)
@@ -218,9 +223,21 @@ def ingest_votacoes(
                 if votacao.siglaOrgao != orgao_value:
                     continue
                 current_votacao_id = str(votacao.id)
-                raw_votos = list(
-                    client.iter_items(f"/votacoes/{votacao.id}/votos", paginate=False)
-                )
+                try:
+                    raw_votos = list(
+                        client.iter_items(f"/votacoes/{votacao.id}/votos", paginate=False)
+                    )
+                except ApiError as exc:
+                    if exc.status_code == 404:
+                        logger.warning(
+                            "votos not found (404): %s-%02d votação %s",
+                            ano,
+                            mes,
+                            votacao.id,
+                        )
+                        votos_not_found.append((ano, mes, str(votacao.id)))
+                        continue
+                    raise
                 for index, raw in enumerate(raw_votos):
                     try:
                         voto_records.append(Voto.model_validate(raw))
@@ -264,6 +281,7 @@ def ingest_votacoes(
         failed=failed,
         votacoes_rows=votacoes_rows,
         votos_rows=votos_rows,
+        votos_not_found=votos_not_found,
     )
 
 

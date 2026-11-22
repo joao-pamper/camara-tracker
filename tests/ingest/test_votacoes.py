@@ -348,6 +348,70 @@ def test_invalid_voto_row_reports_votacao_and_index(tmp_path: Path) -> None:
     assert not votacoes_shard_path(settings, 2024, 3).exists()
 
 
+def test_votos_404_is_recorded_and_does_not_fail_month(tmp_path: Path) -> None:
+    """A 404 on one votação's votos is recorded while other votos are written."""
+    settings = make_settings(tmp_path)
+
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/votacoes").mock(
+            side_effect=[
+                httpx.Response(200, json=load_fixture("votacoes_page_1.json")),
+                httpx.Response(200, json=load_fixture("votacoes_page_2.json")),
+            ]
+        )
+        router.get(f"{BASE_URL}/votacoes/2400001-1/votos").mock(
+            return_value=httpx.Response(404, json={"status": 404})
+        )
+        router.get(f"{BASE_URL}/votacoes/2400003-1/votos").mock(
+            return_value=httpx.Response(200, json=load_fixture("votos_nominal.json"))
+        )
+        with make_client(settings) as client:
+            result = ingest_votacoes(
+                client, settings, years=[2024], months=[3], today=TODAY, now=NOW
+            )
+
+    assert result.months_fetched == 1
+    assert result.failed == []
+    assert result.votacoes_rows == 3
+    assert result.votos_rows == 2
+    assert result.votos_not_found == [(2024, 3, "2400001-1")]
+    votacoes_path, votos_path = shard_paths(settings, 2024, 3)
+    assert votacoes_path.exists() and votos_path.exists()
+    assert read_parquet(votacoes_path).column("id").to_pylist() == [
+        "2400001-1",
+        "2400002-1",
+        "2400003-1",
+    ]
+    assert read_parquet(votos_path).column("_votacao_id").to_pylist() == [
+        "2400003-1",
+        "2400003-1",
+    ]
+
+
+def test_votos_500_still_fails_whole_month(tmp_path: Path) -> None:
+    """A 500 on votos keeps the month-level failure behavior."""
+    settings = make_settings(tmp_path)
+
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/votacoes").mock(
+            return_value=httpx.Response(200, json=votacoes_payload("2400001-1"))
+        )
+        router.get(f"{BASE_URL}/votacoes/2400001-1/votos").mock(
+            return_value=httpx.Response(500)
+        )
+        with make_client(settings) as client:
+            result = ingest_votacoes(
+                client, settings, years=[2024], months=[3], today=TODAY, now=NOW
+            )
+
+    assert result.months_fetched == 0
+    assert len(result.failed) == 1
+    assert result.failed[0][:3] == (2024, 3, "2400001-1")
+    assert result.votos_not_found == []
+    for path in shard_paths(settings, 2024, 3):
+        assert not path.exists()
+
+
 def test_compact_merges_sorts_and_validates_schema(tmp_path: Path) -> None:
     """Compaction merges months into sorted yearly files for both datasets."""
     settings = make_settings(tmp_path)

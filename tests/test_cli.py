@@ -234,6 +234,70 @@ def test_ingest_votacoes_command_exits_nonzero_on_failure(tmp_path: Path) -> Non
     assert "failed 1" in result.stdout
 
 
+def test_ingest_votacoes_command_reports_404_votos_as_warning(tmp_path: Path) -> None:
+    """A 404 on votos exits 0, writes shards, and prints summary/verbose lines."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/votacoes").mock(
+            side_effect=[
+                httpx.Response(200, json=load_fixture("votacoes_page_1.json")),
+                httpx.Response(200, json=load_fixture("votacoes_page_2.json")),
+            ]
+        )
+        router.get(f"{BASE_URL}/votacoes/2400001-1/votos").mock(
+            return_value=httpx.Response(404, json={"status": 404})
+        )
+        router.get(f"{BASE_URL}/votacoes/2400003-1/votos").mock(
+            return_value=httpx.Response(200, json=load_fixture("votos_nominal.json"))
+        )
+        result = CliRunner().invoke(
+            app,
+            ["ingest", "votacoes", "--year", "2024", "--month", "3", "--data-dir", str(tmp_path)],
+        )
+
+    assert result.exit_code == 0, result.stdout
+    assert "votos not found (404): 1 votações" in result.stdout
+    assert "2400001-1" not in result.stdout
+    assert (
+        tmp_path / "bronze" / "votacoes" / "_shards" / "ano=2024" / "mes=03.parquet"
+    ).exists()
+    assert (
+        tmp_path / "bronze" / "votos" / "_shards" / "ano=2024" / "mes=03.parquet"
+    ).exists()
+
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/votacoes").mock(
+            side_effect=[
+                httpx.Response(200, json=load_fixture("votacoes_page_1.json")),
+                httpx.Response(200, json=load_fixture("votacoes_page_2.json")),
+            ]
+        )
+        router.get(f"{BASE_URL}/votacoes/2400001-1/votos").mock(
+            return_value=httpx.Response(404, json={"status": 404})
+        )
+        router.get(f"{BASE_URL}/votacoes/2400003-1/votos").mock(
+            return_value=httpx.Response(200, json=load_fixture("votos_nominal.json"))
+        )
+        verbose_result = CliRunner().invoke(
+            app,
+            [
+                "ingest",
+                "votacoes",
+                "--year",
+                "2024",
+                "--month",
+                "3",
+                "--force",
+                "--verbose",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+
+    assert verbose_result.exit_code == 0, verbose_result.stdout
+    assert "votos not found (404): 1 votações" in verbose_result.stdout
+    assert "2024-03 2400001-1" in verbose_result.stdout
+
+
 def test_votacoes_compact_command_reports_rows(tmp_path: Path) -> None:
     """The compact command reports rows for both yearly datasets."""
     with respx.mock(assert_all_called=False) as router:

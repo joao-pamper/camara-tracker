@@ -145,6 +145,7 @@ def votacoes(
     orgao: Annotated[str | None, typer.Option("--orgao")] = None,
     limit_votacoes: Annotated[int | None, typer.Option("--limit-votacoes")] = None,
     force: Annotated[bool, typer.Option("--force")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose")] = False,
     data_dir: Annotated[Path, typer.Option("--data-dir")] = DEFAULT_DATA_DIR,
 ) -> None:
     """Ingest monthly plenary votações and votes into bronze shards."""
@@ -171,6 +172,11 @@ def votacoes(
         f"failed {len(result.failed)}, "
         f"votacoes rows {result.votacoes_rows}, votos rows {result.votos_rows}"
     )
+    if result.votos_not_found:
+        typer.echo(f"votos not found (404): {len(result.votos_not_found)} votações")
+        if verbose:
+            for ano, mes, votacao_id in result.votos_not_found:
+                typer.echo(f"  - {ano}-{mes:02d} {votacao_id}")
     if result.failed:
         raise typer.Exit(code=1)
 
