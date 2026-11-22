@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from camara_tracker.models import Deputado, Partido
+from camara_tracker.models import Deputado, Despesa, Partido
 
 
 def test_deputado_parses_valid_row() -> None:
@@ -51,6 +51,46 @@ def test_partido_parses_valid_row() -> None:
     assert row.id == 36898
     assert row.sigla == "AVANTE"
     assert row.nome == "Avante"
+
+
+def test_despesa_parses_verified_row() -> None:
+    """A verified despesa response row parses with raw field names."""
+    row = Despesa.model_validate(
+        {
+            "ano": 2024,
+            "mes": 1,
+            "tipoDespesa": "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR",
+            "codDocumento": "7671013",
+            "tipoDocumento": "Nota Fiscal",
+            "codTipoDocumento": 0,
+            "dataDocumento": "2024-01-01T00:00:00",
+            "numDocumento": "008742",
+            "valorDocumento": 103.8,
+            "urlDocumento": "https://example.test/7671013.pdf",
+            "nomeFornecedor": "SAL E BRASA",
+            "cnpjCpfFornecedor": "05956940000253",
+            "valorLiquido": -103.8,
+            "valorGlosa": 0.0,
+            "numRessarcimento": "",
+            "codLote": 2004391,
+            "parcela": 0,
+        }
+    )
+
+    assert row.ano == 2024
+    assert row.codDocumento == "7671013"
+    assert row.codTipoDocumento == 0
+    assert row.valorLiquido == -103.8
+    assert row.numRessarcimento == ""
+
+
+def test_despesa_accepts_nulls_and_ignores_extras() -> None:
+    """Despesa fields are optional and unknown API fields are ignored."""
+    row = Despesa.model_validate({"ano": None, "futureField": "ignored"})
+
+    assert row.mes is None
+    assert row.valorLiquido is None
+    assert not hasattr(row, "futureField")
 
 
 @pytest.mark.parametrize("model", [Deputado, Partido])

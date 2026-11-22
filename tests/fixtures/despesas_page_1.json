@@ -1,0 +1,60 @@
+{
+  "dados": [
+    {
+      "ano": 2024,
+      "mes": 1,
+      "tipoDespesa": "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR",
+      "codDocumento": "7671013",
+      "tipoDocumento": "Nota Fiscal",
+      "codTipoDocumento": 0,
+      "dataDocumento": "2024-01-01T00:00:00",
+      "numDocumento": "008742",
+      "valorDocumento": 103.8,
+      "urlDocumento": "https://www.camara.leg.br/cota-parlamentar/documentos/publ/2227/2024/7671013.pdf",
+      "nomeFornecedor": "SAL E BRASA",
+      "cnpjCpfFornecedor": "05956940000253",
+      "valorLiquido": -103.8,
+      "valorGlosa": 0.0,
+      "numRessarcimento": "",
+      "codLote": 2004391,
+      "parcela": 0
+    },
+    {
+      "ano": 2024,
+      "mes": 1,
+      "tipoDespesa": "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR",
+      "codDocumento": "7671473",
+      "tipoDocumento": "Nota Fiscal",
+      "codTipoDocumento": 0,
+      "dataDocumento": "2024-01-06T00:00:00",
+      "numDocumento": "081614",
+      "valorDocumento": 22.3,
+      "urlDocumento": "https://www.camara.leg.br/cota-parlamentar/documentos/publ/2227/2024/7671473.pdf",
+      "nomeFornecedor": "RESTAURANTE CACIQUE LTDA",
+      "cnpjCpfFornecedor": "14560219000150",
+      "valorLiquido": -22.3,
+      "valorGlosa": 0.0,
+      "numRessarcimento": "",
+      "codLote": 2004391,
+      "parcela": 0
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&itens=2&pagina=1"
+    },
+    {
+      "rel": "next",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=2&itens=2"
+    },
+    {
+      "rel": "first",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=1&itens=2"
+    },
+    {
+      "rel": "last",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=305&itens=2"
+    }
+  ]
+}

@@ -22,6 +22,8 @@ def test_settings_defaults() -> None:
     assert settings.user_agent == "camara-tracker/0.1"
     assert settings.data_dir == Path("data")
     assert settings.legislatura == 57
+    assert settings.first_year == 2023
+    assert settings.shard_max_age_hours == 24.0
 
 
 def test_settings_are_frozen() -> None:

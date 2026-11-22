@@ -18,3 +18,5 @@ class Settings:
     user_agent: str = "camara-tracker/0.1"
     data_dir: Path = Path("data")
     legislatura: int = 57
+    first_year: int = 2023
+    shard_max_age_hours: float = 24.0

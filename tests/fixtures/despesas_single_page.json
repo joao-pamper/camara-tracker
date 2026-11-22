@@ -1,0 +1,29 @@
+{
+  "dados": [
+    {
+      "ano": 2024,
+      "mes": 1,
+      "tipoDespesa": "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR",
+      "codDocumento": "7671013",
+      "tipoDocumento": "Nota Fiscal",
+      "codTipoDocumento": 0,
+      "dataDocumento": "2024-01-01T00:00:00",
+      "numDocumento": "008742",
+      "valorDocumento": 103.8,
+      "urlDocumento": "https://www.camara.leg.br/cota-parlamentar/documentos/publ/2227/2024/7671013.pdf",
+      "nomeFornecedor": "SAL E BRASA",
+      "cnpjCpfFornecedor": "05956940000253",
+      "valorLiquido": -103.8,
+      "valorGlosa": 0.0,
+      "numRessarcimento": "",
+      "codLote": 2004391,
+      "parcela": 0
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&itens=100&pagina=1"
+    }
+  ]
+}

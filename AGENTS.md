@@ -18,3 +18,4 @@ src/camara_tracker/api (HTTP client), ingest (one module per dataset), models.py
 - Do not ask clarifying questions; choose a sensible default and state it in one line.
 - Final reply: at most 5 lines (what changed, test results, assumptions).
 - Prefer reading only the files you need; do not scan the whole repo.
+- Bronze despesas keeps raw API values. The sign of valorLiquido is unreliable (negative on most rows); never use it for totals. Expense metrics use the rule defined in the metrics phase.

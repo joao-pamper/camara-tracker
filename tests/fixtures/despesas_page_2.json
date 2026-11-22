@@ -1,0 +1,64 @@
+{
+  "dados": [
+    {
+      "ano": 2024,
+      "mes": 1,
+      "tipoDespesa": "COMBUSTÍVEIS E LUBRIFICANTES.",
+      "codDocumento": "7672404",
+      "tipoDocumento": "Nota Fiscal",
+      "codTipoDocumento": 0,
+      "dataDocumento": "2024-01-06T00:00:00",
+      "numDocumento": "128758",
+      "valorDocumento": 290.01,
+      "urlDocumento": "https://www.camara.leg.br/cota-parlamentar/documentos/publ/2227/2024/7672404.pdf",
+      "nomeFornecedor": "POSTO AUTO DO TENENTE",
+      "cnpjCpfFornecedor": "11422798000186",
+      "valorLiquido": -290.01,
+      "valorGlosa": 0.0,
+      "numRessarcimento": "",
+      "codLote": 2004390,
+      "parcela": 0
+    },
+    {
+      "ano": 2024,
+      "mes": 1,
+      "tipoDespesa": "COMBUSTÍVEIS E LUBRIFICANTES.",
+      "codDocumento": "7672406",
+      "tipoDocumento": "Nota Fiscal",
+      "codTipoDocumento": 0,
+      "dataDocumento": "2024-01-07T00:00:00",
+      "numDocumento": "159089",
+      "valorDocumento": 330.04,
+      "urlDocumento": "https://www.camara.leg.br/cota-parlamentar/documentos/publ/2227/2024/7672406.pdf",
+      "nomeFornecedor": "POSTO DE COMBUSTIVEIS CACIQUE LTDA",
+      "cnpjCpfFornecedor": "09497421000144",
+      "valorLiquido": -330.04,
+      "valorGlosa": 0.0,
+      "numRessarcimento": "",
+      "codLote": 2004390,
+      "parcela": 0
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&itens=2&pagina=2"
+    },
+    {
+      "rel": "next",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=3&itens=2"
+    },
+    {
+      "rel": "first",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=1&itens=2"
+    },
+    {
+      "rel": "last",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=305&itens=2"
+    },
+    {
+      "rel": "previous",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&pagina=1&itens=2"
+    }
+  ]
+}

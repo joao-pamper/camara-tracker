@@ -59,3 +59,118 @@ def test_ingest_command_writes_parquet(
     assert "rows" in result.stdout
     assert path.exists()
     assert read_parquet(path).num_rows == 2
+
+
+def test_ingest_despesas_command_writes_shards(tmp_path: Path) -> None:
+    """The despesas command writes a shard and reports its summary."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/deputados/1/despesas").mock(
+            return_value=httpx.Response(200, json=load_fixture("despesas_single_page.json"))
+        )
+        result = CliRunner().invoke(
+            app,
+            [
+                "ingest",
+                "despesas",
+                "--year",
+                "2024",
+                "--deputy-id",
+                "1",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+
+    path = tmp_path / "bronze" / "despesas" / "_shards" / "ano=2024" / "deputado=1.parquet"
+    assert result.exit_code == 0, result.stdout
+    assert "fetched 1" in result.stdout
+    assert "rows 1" in result.stdout
+    assert path.exists()
+    assert read_parquet(path).num_rows == 1
+
+
+def test_ingest_despesas_command_exits_nonzero_on_failure(tmp_path: Path) -> None:
+    """Invalid API rows make the despesas command exit non-zero."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/deputados/1/despesas").mock(
+            return_value=httpx.Response(200, json=load_fixture("despesas_invalid.json"))
+        )
+        result = CliRunner().invoke(
+            app,
+            [
+                "ingest",
+                "despesas",
+                "--year",
+                "2024",
+                "--deputy-id",
+                "1",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+
+    assert result.exit_code == 1
+    assert "failed 1" in result.stdout
+
+
+def test_despesas_compact_command_reports_totals(tmp_path: Path) -> None:
+    """The compact command merges shards and reports rows and liquid total."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/deputados/1/despesas").mock(
+            return_value=httpx.Response(200, json=load_fixture("despesas_single_page.json"))
+        )
+        router.get(f"{BASE_URL}/deputados/2/despesas").mock(
+            return_value=httpx.Response(200, json=load_fixture("despesas_single_page.json"))
+        )
+        runner = CliRunner()
+        ingest_result = runner.invoke(
+            app,
+            [
+                "ingest",
+                "despesas",
+                "--year",
+                "2024",
+                "--deputy-id",
+                "1",
+                "--deputy-id",
+                "2",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+        compact_result = runner.invoke(
+            app,
+            [
+                "ingest",
+                "despesas-compact",
+                "--year",
+                "2024",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+
+    path = tmp_path / "bronze" / "despesas" / "despesas_2024.parquet"
+    assert ingest_result.exit_code == 0, ingest_result.stdout
+    assert compact_result.exit_code == 0, compact_result.stdout
+    assert "2024: 2 rows, valorLiquido -207.60" in compact_result.stdout
+    assert path.exists()
+
+
+def test_despesas_compact_command_without_shards_exits_nonzero(tmp_path: Path) -> None:
+    """The compact command fails clearly when a year has no shards."""
+    result = CliRunner().invoke(
+        app,
+        [
+            "ingest",
+            "despesas-compact",
+            "--year",
+            "2024",
+            "--data-dir",
+            str(tmp_path),
+        ],
+    )
+
+    output = result.stdout + result.stderr
+    assert result.exit_code == 1
+    assert "No despesas shards for ano 2024" in output

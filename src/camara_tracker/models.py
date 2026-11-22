@@ -28,3 +28,27 @@ class Partido(BaseModel):
     sigla: str | None = None
     nome: str | None = None
     uri: str | None = None
+
+
+class Despesa(BaseModel):
+    """Raw despesa fields as returned by the API."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    ano: int | None = None
+    mes: int | None = None
+    tipoDespesa: str | None = None
+    codDocumento: str | None = None
+    tipoDocumento: str | None = None
+    codTipoDocumento: int | None = None
+    dataDocumento: str | None = None
+    numDocumento: str | None = None
+    parcela: int | None = None
+    valorDocumento: float | None = None
+    valorLiquido: float | None = None
+    valorGlosa: float | None = None
+    nomeFornecedor: str | None = None
+    cnpjCpfFornecedor: str | None = None
+    codLote: int | None = None
+    urlDocumento: str | None = None
+    numRessarcimento: str | None = None

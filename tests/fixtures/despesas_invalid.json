@@ -1,0 +1,18 @@
+{
+  "dados": [
+    {
+      "ano": "not-an-int",
+      "mes": 1,
+      "tipoDespesa": "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR",
+      "codDocumento": "7671013",
+      "dataDocumento": "2024-01-01T00:00:00",
+      "valorLiquido": -103.8
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881/despesas?ano=2024&itens=2&pagina=1"
+    }
+  ]
+}

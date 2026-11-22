@@ -9,9 +9,10 @@ import pyarrow.parquet as pq
 import pytest
 
 from camara_tracker import storage
-from camara_tracker.models import Deputado
+from camara_tracker.models import Deputado, Despesa
 from camara_tracker.storage import (
     DEPUTADOS_SCHEMA,
+    DESPESAS_SCHEMA,
     PARTIDOS_SCHEMA,
     read_parquet,
     records_to_table,
@@ -85,3 +86,19 @@ def test_records_to_table_empty_has_schema(tmp_path: Path) -> None:
 
     assert table.num_rows == 0
     assert table.schema == PARTIDOS_SCHEMA
+
+
+def test_records_to_table_adds_constant_columns() -> None:
+    """Despesa records receive shard constants with the explicit schema."""
+    table = records_to_table(
+        [Despesa(ano=2024, valorLiquido=-103.8)],
+        DESPESAS_SCHEMA,
+        NOW,
+        57,
+        constants={"_deputado_id": 62881, "_ano": 2024},
+    )
+
+    assert table.schema == DESPESAS_SCHEMA
+    assert table.column("_deputado_id").to_pylist() == [62881]
+    assert table.column("_ano").to_pylist() == [2024]
+    assert table.column("valorLiquido").to_pylist() == [-103.8]
