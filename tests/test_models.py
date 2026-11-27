@@ -3,7 +3,15 @@
 import pytest
 from pydantic import ValidationError
 
-from camara_tracker.models import Deputado, Despesa, Partido, Votacao, Voto
+from camara_tracker.models import (
+    Deputado,
+    DeputadoHistorico,
+    Despesa,
+    Partido,
+    Proposicao,
+    Votacao,
+    Voto,
+)
 
 
 def test_deputado_parses_valid_row() -> None:
@@ -93,11 +101,81 @@ def test_despesa_accepts_nulls_and_ignores_extras() -> None:
     assert not hasattr(row, "futureField")
 
 
-@pytest.mark.parametrize("model", [Deputado, Partido])
-def test_missing_id_fails(model: type[Deputado] | type[Partido]) -> None:
-    """Both models require the raw id field."""
+@pytest.mark.parametrize("model", [Deputado, Partido, DeputadoHistorico, Proposicao])
+def test_missing_id_fails(
+    model: type[Deputado] | type[Partido] | type[DeputadoHistorico] | type[Proposicao],
+) -> None:
+    """All raw bronze models require the API id field."""
     with pytest.raises(ValidationError):
         model.model_validate({"nome": "sem id"})
+
+
+def test_deputado_historico_parses_verified_row() -> None:
+    """A verified histórico row parses with raw field names and ignores extras."""
+    row = DeputadoHistorico.model_validate(
+        {
+            "id": 62881,
+            "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/62881",
+            "nome": "Danilo Forte",
+            "nomeEleitoral": "DANILO FORTE",
+            "siglaPartido": "PP",
+            "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37903",
+            "siglaUf": "CE",
+            "idLegislatura": 58,
+            "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/62881.jpg",
+            "email": None,
+            "dataHora": "2023-02-01T00:00",
+            "situacao": None,
+            "condicaoEleitoral": None,
+            "descricaoStatus": "Nome no início da legislatura",
+            "futureField": "ignored",
+        }
+    )
+
+    assert row.id == 62881
+    assert row.dataHora == "2023-02-01T00:00"
+    assert row.idLegislatura == 58
+    assert row.situacao is None
+    assert not hasattr(row, "nomeEleitoral")
+    assert not hasattr(row, "futureField")
+
+
+def test_deputado_historico_requires_data_hora() -> None:
+    """A histórico row without dataHora fails validation."""
+    with pytest.raises(ValidationError):
+        DeputadoHistorico.model_validate({"id": 1})
+
+
+def test_proposicao_parses_verified_row() -> None:
+    """A verified proposição row parses with raw field names and ignores extras."""
+    row = Proposicao.model_validate(
+        {
+            "id": 2418080,
+            "uri": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2418080",
+            "siglaTipo": "REQ",
+            "codTipo": 609,
+            "numero": 282,
+            "ano": 2024,
+            "ementa": "Requer a criação de uma frente parlamentar.",
+            "dataApresentacao": "2024-02-20T13:01",
+            "futureField": "ignored",
+        }
+    )
+
+    assert row.id == 2418080
+    assert row.siglaTipo == "REQ"
+    assert row.numero == 282
+    assert not hasattr(row, "dataApresentacao")
+    assert not hasattr(row, "futureField")
+
+
+def test_proposicao_accepts_nulls_and_ignores_extras() -> None:
+    """Proposição optional fields may be null."""
+    row = Proposicao.model_validate({"id": 1, "ano": None, "ementa": None})
+
+    assert row.uri is None
+    assert row.codTipo is None
+    assert row.ano is None
 
 
 def test_votacao_parses_verified_row() -> None:

@@ -1,0 +1,19 @@
+{
+  "dados": [
+    {
+      "id": 2418082,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2418082",
+      "siglaTipo": "REQ",
+      "codTipo": 609,
+      "numero": 283,
+      "ano": 2024,
+      "ementa": "Requer informações ao Ministro de Estado."
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/proposicoes?idDeputadoAutor=1&ano=2024&itens=2&pagina=2"
+    }
+  ]
+}

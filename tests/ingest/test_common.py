@@ -3,7 +3,14 @@
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
-from camara_tracker.ingest.common import IngestResult, bronze_path, utc_now
+import pytest
+
+from camara_tracker.ingest.common import (
+    IngestResult,
+    bronze_path,
+    require_non_default_data_dir,
+    utc_now,
+)
 
 
 def test_bronze_path() -> None:
@@ -23,6 +30,17 @@ def test_utc_now_preserves_aware_datetimes() -> None:
     aware = datetime(2024, 1, 2, 3, 4, 5, tzinfo=timezone(timedelta(hours=2)))
 
     assert utc_now(aware) == aware.astimezone(UTC)
+
+
+def test_require_non_default_data_dir_rejects_only_limited_default_runs(
+    tmp_path: Path,
+) -> None:
+    """A limit option may not target the default data directory."""
+    with pytest.raises(ValueError, match="limit options require a non-default --data-dir"):
+        require_non_default_data_dir(Path("data"), limited=True)
+
+    require_non_default_data_dir(Path("data"), limited=False)
+    require_non_default_data_dir(tmp_path, limited=True)
 
 
 def test_ingest_result_is_a_summary() -> None:

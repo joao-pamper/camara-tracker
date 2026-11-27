@@ -1,0 +1,26 @@
+{
+  "dados": [
+    {
+      "id": 2,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/2",
+      "nome": "Bruno Costa",
+      "nomeEleitoral": "BRUNO COSTA",
+      "siglaPartido": "PSB",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/1",
+      "siglaUf": "RJ",
+      "idLegislatura": 57,
+      "urlFoto": null,
+      "email": null,
+      "dataHora": "2024-02-01T00:00",
+      "situacao": "Suplente",
+      "condicaoEleitoral": "Eleito",
+      "descricaoStatus": "Assumiu o mandato"
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/2/historico"
+    }
+  ]
+}

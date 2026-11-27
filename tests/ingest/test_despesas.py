@@ -323,6 +323,23 @@ def test_compact_despesas_merges_and_sorts(tmp_path: Path) -> None:
     ]
 
 
+def test_limit_deputies_requires_non_default_data_dir() -> None:
+    """A partial despesas run refuses the default data directory."""
+    settings = Settings(data_dir=Path("data"))
+
+    with (
+        CamaraClient(settings) as client,
+        pytest.raises(ValueError, match="limit options require a non-default --data-dir"),
+    ):
+        ingest_despesas(
+            client,
+            settings,
+            years=[2024],
+            deputy_ids=[1],
+            limit_deputies=1,
+        )
+
+
 def test_compact_despesas_without_shards_fails_clearly(tmp_path: Path) -> None:
     """Compaction fails when a year has no shards."""
     settings = make_settings(tmp_path)

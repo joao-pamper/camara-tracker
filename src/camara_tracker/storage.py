@@ -27,6 +27,26 @@ DEPUTADOS_SCHEMA: pa.Schema = pa.schema(
     ]
 )
 
+DEPUTADOS_HISTORICO_SCHEMA: pa.Schema = pa.schema(
+    [
+        pa.field("id", pa.int64()),
+        pa.field("uri", pa.string()),
+        pa.field("nome", pa.string()),
+        pa.field("siglaPartido", pa.string()),
+        pa.field("uriPartido", pa.string()),
+        pa.field("siglaUf", pa.string()),
+        pa.field("idLegislatura", pa.int32()),
+        pa.field("urlFoto", pa.string()),
+        pa.field("email", pa.string()),
+        pa.field("dataHora", pa.string()),
+        pa.field("situacao", pa.string()),
+        pa.field("condicaoEleitoral", pa.string()),
+        pa.field("descricaoStatus", pa.string()),
+        pa.field("_ingested_at", pa.timestamp("us", tz="UTC")),
+        pa.field("_legislatura", pa.int32()),
+    ]
+)
+
 PARTIDOS_SCHEMA: pa.Schema = pa.schema(
     [
         pa.field("id", pa.int64()),
@@ -57,6 +77,22 @@ DESPESAS_SCHEMA: pa.Schema = pa.schema(
         pa.field("codLote", pa.int64()),
         pa.field("urlDocumento", pa.string()),
         pa.field("numRessarcimento", pa.string()),
+        pa.field("_ingested_at", pa.timestamp("us", tz="UTC")),
+        pa.field("_legislatura", pa.int32()),
+        pa.field("_deputado_id", pa.int64()),
+        pa.field("_ano", pa.int32()),
+    ]
+)
+
+PROPOSICOES_SCHEMA: pa.Schema = pa.schema(
+    [
+        pa.field("id", pa.int64()),
+        pa.field("uri", pa.string()),
+        pa.field("siglaTipo", pa.string()),
+        pa.field("codTipo", pa.int32()),
+        pa.field("numero", pa.int32()),
+        pa.field("ano", pa.int32()),
+        pa.field("ementa", pa.string()),
         pa.field("_ingested_at", pa.timestamp("us", tz="UTC")),
         pa.field("_legislatura", pa.int32()),
         pa.field("_deputado_id", pa.int64()),

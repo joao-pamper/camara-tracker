@@ -451,6 +451,17 @@ def test_compact_merges_sorts_and_validates_schema(tmp_path: Path) -> None:
     assert votos_table.column("deputado_id").to_pylist() == [2, 9, 3, 4]
 
 
+def test_limit_votacoes_requires_non_default_data_dir() -> None:
+    """A partial votações run refuses the default data directory."""
+    settings = Settings(data_dir=Path("data"))
+
+    with (
+        make_client(settings) as client,
+        pytest.raises(ValueError, match="limit options require a non-default --data-dir"),
+    ):
+        ingest_votacoes(client, settings, years=[2024], months=[3], limit_votacoes=2)
+
+
 def test_compact_without_shards_fails_clearly(tmp_path: Path) -> None:
     """Compaction reports the missing year instead of writing empty files."""
     settings = make_settings(tmp_path)

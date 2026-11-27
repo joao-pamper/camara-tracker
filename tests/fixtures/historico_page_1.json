@@ -1,0 +1,58 @@
+{
+  "dados": [
+    {
+      "id": 1,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/1",
+      "nome": "Ana Silva",
+      "nomeEleitoral": "ANA SILVA",
+      "siglaPartido": "PP",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37903",
+      "siglaUf": "SP",
+      "idLegislatura": 57,
+      "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/1.jpg",
+      "email": null,
+      "dataHora": "2024-06-01T00:00",
+      "situacao": null,
+      "condicaoEleitoral": null,
+      "descricaoStatus": "Em exercício"
+    },
+    {
+      "id": 1,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/1",
+      "nome": "Ana Silva",
+      "nomeEleitoral": "ANA SILVA",
+      "siglaPartido": "PP",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37903",
+      "siglaUf": "SP",
+      "idLegislatura": 57,
+      "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/1.jpg",
+      "email": null,
+      "dataHora": "2023-02-01T00:00",
+      "situacao": "Titular",
+      "condicaoEleitoral": "Eleito",
+      "descricaoStatus": "Nome no início da legislatura"
+    },
+    {
+      "id": 1,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/1",
+      "nome": "Ana Silva",
+      "nomeEleitoral": "ANA SILVA",
+      "siglaPartido": "PP",
+      "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37903",
+      "siglaUf": "SP",
+      "idLegislatura": 57,
+      "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/1.jpg",
+      "email": null,
+      "dataHora": "2025-01-01T00:00",
+      "situacao": "Titular",
+      "condicaoEleitoral": null,
+      "descricaoStatus": null
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/1/historico"
+    }
+  ]
+}

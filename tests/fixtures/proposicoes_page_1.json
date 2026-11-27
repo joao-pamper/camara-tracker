@@ -1,0 +1,33 @@
+{
+  "dados": [
+    {
+      "id": 2418080,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2418080",
+      "siglaTipo": "REQ",
+      "codTipo": 609,
+      "numero": 282,
+      "ano": 2024,
+      "ementa": "Requer a criação de uma frente parlamentar.",
+      "dataApresentacao": "2024-02-20T13:01"
+    },
+    {
+      "id": 2418081,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2418081",
+      "siglaTipo": "PL",
+      "codTipo": 149,
+      "numero": 1000,
+      "ano": 2024,
+      "ementa": "Dispõe sobre medidas de emergência."
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/proposicoes?idDeputadoAutor=1&ano=2024&itens=2&pagina=1"
+    },
+    {
+      "rel": "next",
+      "href": "https://dadosabertos.camara.leg.br/api/v2/proposicoes?idDeputadoAutor=1&ano=2024&itens=2&pagina=2"
+    }
+  ]
+}

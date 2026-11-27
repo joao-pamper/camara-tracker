@@ -61,6 +61,132 @@ def test_ingest_command_writes_parquet(
     assert read_parquet(path).num_rows == 2
 
 
+@pytest.mark.parametrize(
+    ("command", "option"),
+    [
+        ("despesas", "--limit-deputies"),
+        ("historico", "--limit-deputies"),
+        ("proposicoes", "--limit-deputies"),
+        ("votacoes", "--limit-votacoes"),
+    ],
+)
+def test_limit_options_require_non_default_data_dir(command: str, option: str) -> None:
+    """Partial CLI runs report the guard error and exit non-zero."""
+    with respx.mock(assert_all_called=False) as router:
+        result = CliRunner().invoke(app, ["ingest", command, option, "1"])
+
+    output = result.stdout + result.stderr
+    assert result.exit_code == 1
+    assert "limit options require a non-default --data-dir" in output
+    assert len(router.calls) == 0
+
+
+def test_ingest_historico_command_writes_file(tmp_path: Path) -> None:
+    """The historico command writes one bronze file and reports progress."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/deputados/1/historico").mock(
+            return_value=httpx.Response(200, json=load_fixture("historico_page_1.json"))
+        )
+        result = CliRunner().invoke(
+            app,
+            ["ingest", "historico", "--deputy-id", "1", "--data-dir", str(tmp_path)],
+        )
+
+    path = tmp_path / "bronze" / "deputados_historico.parquet"
+    assert result.exit_code == 0, result.stdout
+    assert "historico: 1/1 deputies" in result.stdout
+    assert "3 rows" in result.stdout
+    assert path.exists()
+    assert read_parquet(path).num_rows == 3
+
+
+def test_ingest_historico_command_exits_nonzero_on_failure(tmp_path: Path) -> None:
+    """A failed historico request makes the command exit non-zero."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/deputados/2/historico").mock(
+            return_value=httpx.Response(500)
+        )
+        result = CliRunner().invoke(
+            app,
+            ["ingest", "historico", "--deputy-id", "2", "--data-dir", str(tmp_path)],
+        )
+
+    output = result.stdout + result.stderr
+    assert result.exit_code == 1
+    assert "historico failed" in output
+    assert not (tmp_path / "bronze" / "deputados_historico.parquet").exists()
+
+
+def test_ingest_proposicoes_command_and_compact(tmp_path: Path) -> None:
+    """The proposicoes commands write a shard and compact it into a yearly file."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/proposicoes").mock(
+            side_effect=[
+                httpx.Response(200, json=load_fixture("proposicoes_page_1.json")),
+                httpx.Response(200, json=load_fixture("proposicoes_page_2.json")),
+            ]
+        )
+        runner = CliRunner()
+        ingest_result = runner.invoke(
+            app,
+            [
+                "ingest",
+                "proposicoes",
+                "--year",
+                "2024",
+                "--deputy-id",
+                "1",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+        compact_result = runner.invoke(
+            app,
+            [
+                "ingest",
+                "proposicoes-compact",
+                "--year",
+                "2024",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+
+    shard = tmp_path / "bronze" / "proposicoes" / "_shards" / "ano=2024" / "deputado=1.parquet"
+    path = tmp_path / "bronze" / "proposicoes" / "proposicoes_2024.parquet"
+    assert ingest_result.exit_code == 0, ingest_result.stdout
+    assert "fetched 1" in ingest_result.stdout
+    assert "rows 3" in ingest_result.stdout
+    assert compact_result.exit_code == 0, compact_result.stdout
+    assert "2024: proposicoes 3 rows" in compact_result.stdout
+    assert shard.exists()
+    assert read_parquet(path).num_rows == 3
+
+
+def test_ingest_proposicoes_command_exits_nonzero_on_failure(tmp_path: Path) -> None:
+    """Invalid API rows make the proposicoes command exit non-zero."""
+    with respx.mock(assert_all_called=False) as router:
+        router.get(f"{BASE_URL}/proposicoes").mock(
+            return_value=httpx.Response(200, json=load_fixture("proposicoes_invalid.json"))
+        )
+        result = CliRunner().invoke(
+            app,
+            [
+                "ingest",
+                "proposicoes",
+                "--year",
+                "2024",
+                "--deputy-id",
+                "1",
+                "--data-dir",
+                str(tmp_path),
+            ],
+        )
+
+    assert result.exit_code == 1
+    assert "failed 1" in result.stdout
+
+
 def test_ingest_despesas_command_writes_shards(tmp_path: Path) -> None:
     """The despesas command writes a shard and reports its summary."""
     with respx.mock(assert_all_called=False) as router:

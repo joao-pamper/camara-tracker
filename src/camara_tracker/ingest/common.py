@@ -20,6 +20,12 @@ def bronze_path(data_dir: Path, dataset: str) -> Path:
     return data_dir / "bronze" / f"{dataset}.parquet"
 
 
+def require_non_default_data_dir(data_dir: Path, *, limited: bool) -> None:
+    """Reject partial runs that would write into the default data directory."""
+    if limited and data_dir.resolve() == Path("data").resolve():
+        raise ValueError("limit options require a non-default --data-dir")
+
+
 def utc_now(now: datetime | None = None) -> datetime:
     """Return an injected timestamp normalized to UTC, or the current time."""
     if now is None:

@@ -1,0 +1,13 @@
+{
+  "dados": [
+    {
+      "id": 3,
+      "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/3",
+      "nome": "Carla Dias",
+      "siglaPartido": "PT",
+      "siglaUf": "MG",
+      "idLegislatura": 57
+    }
+  ],
+  "links": []
+}

@@ -9,11 +9,13 @@ import pyarrow.parquet as pq
 import pytest
 
 from camara_tracker import storage
-from camara_tracker.models import Deputado, Despesa, Votacao, Voto
+from camara_tracker.models import Deputado, DeputadoHistorico, Despesa, Proposicao, Votacao, Voto
 from camara_tracker.storage import (
+    DEPUTADOS_HISTORICO_SCHEMA,
     DEPUTADOS_SCHEMA,
     DESPESAS_SCHEMA,
     PARTIDOS_SCHEMA,
+    PROPOSICOES_SCHEMA,
     VOTACOES_SCHEMA,
     VOTOS_SCHEMA,
     read_parquet,
@@ -104,6 +106,33 @@ def test_records_to_table_adds_constant_columns() -> None:
     assert table.column("_deputado_id").to_pylist() == [62881]
     assert table.column("_ano").to_pylist() == [2024]
     assert table.column("valorLiquido").to_pylist() == [-103.8]
+
+
+def test_historico_and_proposicoes_schemas_are_explicit() -> None:
+    """New bronze schemas carry metadata and shard constants."""
+    historico = records_to_table(
+        [DeputadoHistorico(id=62881, dataHora="2023-02-01T00:00")],
+        DEPUTADOS_HISTORICO_SCHEMA,
+        NOW,
+        57,
+    )
+    proposicao = records_to_table(
+        [Proposicao(id=2418080, ano=2024)],
+        PROPOSICOES_SCHEMA,
+        NOW,
+        57,
+        constants={"_deputado_id": 62881, "_ano": 2024},
+    )
+
+    assert historico.schema.equals(DEPUTADOS_HISTORICO_SCHEMA, check_metadata=False)
+    assert historico.schema.field("_ingested_at").type == pa.timestamp("us", tz="UTC")
+    assert historico.schema.field("_legislatura").type == pa.int32()
+    assert historico.column("dataHora").to_pylist() == ["2023-02-01T00:00"]
+    assert proposicao.schema.equals(PROPOSICOES_SCHEMA, check_metadata=False)
+    assert proposicao.schema.field("_deputado_id").type == pa.int64()
+    assert proposicao.schema.field("_ano").type == pa.int32()
+    assert proposicao.column("_deputado_id").to_pylist() == [62881]
+    assert proposicao.column("ano").to_pylist() == [2024]
 
 
 def test_records_to_table_votacoes_and_votos() -> None:

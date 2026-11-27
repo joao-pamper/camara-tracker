@@ -12,7 +12,12 @@ from pydantic import ValidationError
 
 from camara_tracker.api import CamaraClient
 from camara_tracker.config import Settings
-from camara_tracker.ingest.common import IngestResult, bronze_path, utc_now
+from camara_tracker.ingest.common import (
+    IngestResult,
+    bronze_path,
+    require_non_default_data_dir,
+    utc_now,
+)
 from camara_tracker.models import Despesa
 from camara_tracker.storage import DESPESAS_SCHEMA, records_to_table, write_parquet
 
@@ -124,6 +129,7 @@ def ingest_despesas(
     max_pages: int | None = None,
 ) -> DespesasResult:
     """Fetch expense shards, isolating failures per deputy-year."""
+    require_non_default_data_dir(settings.data_dir, limited=limit_deputies is not None)
     today_value = today or date.today()
     ingested_at = utc_now(now)
     deputy_values = _deputy_ids(settings, deputy_ids, limit_deputies)

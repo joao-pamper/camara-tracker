@@ -13,7 +13,7 @@ from pydantic import ValidationError
 
 from camara_tracker.api import ApiError, CamaraClient
 from camara_tracker.config import Settings
-from camara_tracker.ingest.common import IngestResult, utc_now
+from camara_tracker.ingest.common import IngestResult, require_non_default_data_dir, utc_now
 from camara_tracker.models import Votacao, Voto
 from camara_tracker.storage import (
     VOTACOES_SCHEMA,
@@ -168,6 +168,7 @@ def ingest_votacoes(
     progress: Callable[[int, int], None] | None = None,
 ) -> VotacoesResult:
     """Fetch month shards, keeping both shards atomic per month."""
+    require_non_default_data_dir(settings.data_dir, limited=limit_votacoes is not None)
     today_value = today or date.today()
     ingested_at = utc_now(now)
     orgao_value = settings.votes_orgao if orgao is None else orgao

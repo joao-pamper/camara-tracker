@@ -9,8 +9,11 @@ from camara_tracker.api import CamaraClient
 from camara_tracker.config import Settings
 from camara_tracker.ingest import (
     ingest_despesas,
+    ingest_historico,
     ingest_partidos,
+    ingest_proposicoes,
     ingest_votacoes,
+    proposicoes_shard_path,
     shard_path,
     shard_paths,
 )
@@ -40,6 +43,46 @@ def test_live_ingest_partidos(tmp_path: Path) -> None:
 
     assert result.rows > 0
     assert result.path.exists()
+
+
+@pytest.mark.live
+def test_live_ingest_historico(tmp_path: Path) -> None:
+    """Ingest one live deputy's status history and verify the bronze file."""
+    settings = Settings(data_dir=tmp_path, min_interval_s=0.0)
+
+    with CamaraClient(settings) as client:
+        result = ingest_historico(
+            client,
+            settings,
+            deputy_ids=[62881],
+            limit_deputies=1,
+            now=datetime.now(tz=UTC),
+        )
+
+    path = tmp_path / "bronze" / "deputados_historico.parquet"
+    assert result.rows > 0
+    assert path.exists()
+
+
+@pytest.mark.live
+def test_live_ingest_proposicoes(tmp_path: Path) -> None:
+    """Ingest one live deputy-year of propositions and verify its shard."""
+    settings = Settings(data_dir=tmp_path, min_interval_s=0.0)
+
+    with CamaraClient(settings) as client:
+        result = ingest_proposicoes(
+            client,
+            settings,
+            years=[2024],
+            deputy_ids=[62881],
+            limit_deputies=1,
+            now=datetime.now(tz=UTC),
+        )
+
+    path = proposicoes_shard_path(settings, 2024, 62881)
+    assert result.rows > 0
+    assert result.failed == []
+    assert path.exists()
 
 
 @pytest.mark.live

@@ -21,6 +21,40 @@ class Deputado(BaseModel):
     email: str | None = None
 
 
+class DeputadoHistorico(BaseModel):
+    """Raw deputy status-history fields as returned by the API."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    id: int
+    uri: str | None = None
+    nome: str | None = None
+    siglaPartido: str | None = None
+    uriPartido: str | None = None
+    siglaUf: str | None = None
+    idLegislatura: int | None = None
+    urlFoto: str | None = None
+    email: str | None = None
+    dataHora: str
+    situacao: str | None = None
+    condicaoEleitoral: str | None = None
+    descricaoStatus: str | None = None
+
+
+class Proposicao(BaseModel):
+    """Raw authored-proposition fields as returned by the API."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    id: int
+    uri: str | None = None
+    siglaTipo: str | None = None
+    codTipo: int | None = None
+    numero: int | None = None
+    ano: int | None = None
+    ementa: str | None = None
+
+
 class Partido(BaseModel):
     """Raw partido fields as returned by the API."""
 
